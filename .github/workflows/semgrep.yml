@@ -1,14 +1,10 @@
-
-name: Run Semgrep (no install)
+name: Run Semgrep (minimal)
 
 on:
+  workflow_dispatch:
   push:
     branches: [ main, master ]
   pull_request:
-  workflow_dispatch:
-
-permissions:
-  contents: read
 
 jobs:
   semgrep:
@@ -16,15 +12,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Roda o Semgrep usando regras públicas automaticamente
+      # Use o Action oficial (sem docker manual!)
       - name: Semgrep (auto rules)
         uses: returntocorp/semgrep-action@v1
         with:
-          args: >
-            --config=auto
-            --json --output semgrep-results.json
+          args: --config=auto --json --output=semgrep-results.json
 
-      # Publica o resultado como "Artifact" pra baixar
       - name: Upload Semgrep results
         uses: actions/upload-artifact@v4
         with:
