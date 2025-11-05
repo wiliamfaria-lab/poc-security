@@ -1,0 +1,32 @@
+
+name: Run Semgrep (no install)
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  semgrep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Roda o Semgrep usando regras públicas automaticamente
+      - name: Semgrep (auto rules)
+        uses: returntocorp/semgrep-action@v1
+        with:
+          args: >
+            --config=auto
+            --json --output semgrep-results.json
+
+      # Publica o resultado como "Artifact" pra baixar
+      - name: Upload Semgrep results
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-results
+          path: semgrep-results.json
