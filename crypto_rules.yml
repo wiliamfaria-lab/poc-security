@@ -1,0 +1,39 @@
+rules:
+  - id: insecure-md5
+    languages: [python, javascript, java]
+    message: "Uso de MD5 — algoritmo criptograficamente inseguro"
+    severity: ERROR
+    pattern-either:
+      - pattern: hashlib.md5(...)
+      - pattern: crypto.createHash("md5").update(...)
+      - pattern: MessageDigest.getInstance("MD5")
+
+  - id: insecure-sha1
+    languages: [python, javascript, java]
+    message: "Uso de SHA-1 — considerado inseguro"
+    severity: WARNING
+    pattern-either:
+      - pattern: hashlib.sha1(...)
+      - pattern: crypto.createHash("sha1").update(...)
+      - pattern: MessageDigest.getInstance("SHA-1")
+
+  - id: aes-ecb-mode
+    languages: [python, javascript, java]
+    message: "Uso de AES/ECB — modo inseguro (vaza padrões)"
+    severity: ERROR
+    pattern-either:
+      - pattern: AES.new(..., AES.MODE_ECB)
+      - pattern: crypto.createCipheriv("aes-128-ecb", ..., ...)
+      - pattern: Cipher.getInstance("AES/ECB/PKCS5Padding")
+
+  - id: rsa-small-key-1024
+    languages: [python, javascript, java]
+    message: "RSA com chave < 2048 bits — inseguro"
+    severity: ERROR
+    pattern-either:
+      - pattern: RSA.generate(1024)
+      - pattern: crypto.generateKeyPairSync("rsa", { ..., modulusLength: 1024, ... })
+      - pattern: |
+          KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+          ...
+          kpg.initialize(1024);
